@@ -1,8 +1,9 @@
-bitcoin-seeder
+rincoin-seeder
 ==============
 
-Bitcoin-seeder is a crawler for the Bitcoin network, which exposes a list
-of reliable nodes via a built-in DNS server.
+Rincoin-seeder is a crawler for the Rincoin network, which exposes a list
+of reliable nodes via a built-in DNS server. It is the Rincoin
+fork of Pieter Wuille's bitcoin-seeder.
 
 Features:
 * regularly revisits known nodes to check their availability

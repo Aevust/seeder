@@ -1,3 +1,7 @@
+// Copyright (c) 2024-2026 The Rincoin Core developers
+// Originally derived from bitcoin-seeder by Pieter Wuille (sipa).
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <algorithm>
 
 #define __STDC_FORMAT_MACROS
@@ -9,7 +13,7 @@
 #include <getopt.h>
 #include <atomic>
 
-#include "bitcoin.h"
+#include "rincoin.h"
 #include "db.h"
 
 using namespace std;
@@ -40,7 +44,7 @@ public:
   CDnsSeedOpts() : nThreads(96), nDnsThreads(4), ip_addr("::"), nPort(53), nP2Port(0), nMinimumHeight(0), mbox(NULL), ns(NULL), host(NULL), tor(NULL), fUseTestNet(false), fWipeBan(false), fWipeIgnore(false), ipv4_proxy(NULL), ipv6_proxy(NULL), magic(NULL) {}
 
   void ParseCommandLine(int argc, char **argv) {
-    static const char *help = "Bitcoin-seeder\n"
+    static const char *help = "Rincoin seeder\n"
                               "Usage: %s -h <host> -n <ns> [-m <mbox>] [-t <threads>] [-p <port>]\n"
                               "\n"
                               "Options:\n"

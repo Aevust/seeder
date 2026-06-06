@@ -1,3 +1,7 @@
+// Copyright (c) 2024-2026 The Rincoin Core developers
+// Originally derived from bitcoin-seeder by Pieter Wuille (sipa).
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef _UTIL_H_
 #define _UTIL_H_ 1
 
