@@ -20,11 +20,22 @@
 #include <string.h>
 
 /*
+ * glibc 2.38+ (2023) and the BSDs provide strlcpy/strlcat in libc,
+ * declared under __GLIBC_USE(LIB_EXT2). Compile our own copy only
+ * when the C library does not (third term short-circuits when
+ * __GLIBC_USE is undefined). The bundled definitions also carry the
+ * gnu_inline attribute as a second line of defence so that, if a
+ * libc declaration is ever visible at the same time (e.g. via
+ * _FORTIFY_SOURCE), the attribute matches glibc's and avoids the
+ * "redeclared inline without gnu_inline attribute" error.
+ */
+#if !defined(__GLIBC__) || !defined(__GLIBC_USE) || !__GLIBC_USE(LIB_EXT2)
+/*
  * Copy src to string dst of size siz.  At most siz-1 characters
  * will be copied.  Always NUL terminates (unless siz == 0).
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
-inline size_t strlcpy(char *dst, const char *src, size_t siz)
+__attribute__((gnu_inline)) inline size_t strlcpy(char *dst, const char *src, size_t siz)
 {
     char *d = dst;
     const char *s = src;
@@ -59,7 +70,7 @@ inline size_t strlcpy(char *dst, const char *src, size_t siz)
  * Returns strlen(src) + MIN(siz, strlen(initial dst)).
  * If retval >= siz, truncation occurred.
  */
-inline size_t strlcat(char *dst, const char *src, size_t siz)
+__attribute__((gnu_inline)) inline size_t strlcat(char *dst, const char *src, size_t siz)
 {
     char *d = dst;
     const char *s = src;
@@ -87,4 +98,5 @@ inline size_t strlcat(char *dst, const char *src, size_t siz)
 
     return(dlen + (s - src)); /* count does not include NUL */
 }
-#endif
+#endif // !__GLIBC_USE(LIB_EXT2) : bundled strlcpy/strlcat fallback
+#endif // RINCOIN_STRLCPY_H
