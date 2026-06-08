@@ -20,6 +20,23 @@
 #include <string.h>
 
 /*
+ * glibc 2.38 (2023) added strlcpy/strlcat to libc, declared in
+ * <string.h> under __USE_MISC. Compile our own copies only when the
+ * C library does not provide them. The version check keeps the bundled
+ * fallback on glibc < 2.38; the __USE_MISC term matches the exact
+ * condition under which glibc declares these functions, so a strict
+ * build without _DEFAULT_SOURCE still gets the fallback. The nested
+ * guards keep the preprocessor from evaluating __GLIBC_PREREQ on
+ * non-glibc platforms, where it is undefined.
+ */
+#if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#  if __GLIBC_PREREQ(2, 38) && defined(__USE_MISC)
+#    define HAVE_LIBC_STRLCPY 1
+#  endif
+#endif
+
+#ifndef HAVE_LIBC_STRLCPY
+/*
  * Copy src to string dst of size siz.  At most siz-1 characters
  * will be copied.  Always NUL terminates (unless siz == 0).
  * Returns strlen(src); if retval >= siz, truncation occurred.
@@ -87,4 +104,5 @@ inline size_t strlcat(char *dst, const char *src, size_t siz)
 
     return(dlen + (s - src)); /* count does not include NUL */
 }
-#endif
+#endif /* !HAVE_LIBC_STRLCPY */
+#endif // RINCOIN_STRLCPY_H
