@@ -471,7 +471,7 @@ extern "C" void* ThreadStats(void*) {
   return nullptr;
 }
 
-static const string mainnet_seeds[] = {"seed.rin.so", ""};
+static const string mainnet_seeds[] = {"163.44.119.190", "210.131.221.23", ""};
 static const string testnet_seeds[] = {""};
 static const string *seeds = mainnet_seeds;
 static vector<string> vSeeds;
