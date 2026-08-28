@@ -230,6 +230,9 @@ public:
         filter_whitelist.insert(NODE_NETWORK_LIMITED | NODE_WITNESS | NODE_BLOOM); // x40c
         filter_whitelist.insert(NODE_NETWORK | NODE_WITNESS | NODE_MWEB); // x1000009
         filter_whitelist.insert(NODE_NETWORK | NODE_WITNESS | NODE_MWEB | NODE_RIN3); // x3000009
+    } else {
+        fprintf(stderr, "Note: -w replaces the default filter set; only the"
+                        " listed filters are served.\n");
     }
     if (host != NULL && ns == NULL) showHelp = true;
     if (showHelp) fprintf(stderr, help, argv[0]);
