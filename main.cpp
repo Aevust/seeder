@@ -90,7 +90,7 @@ public:
         {"testnet", no_argument, &fUseTestNet, 1},
         {"wipeban", no_argument, &fWipeBan, 1},
         {"wipeignore", no_argument, &fWipeIgnore, 1},
-        {"help", no_argument, 0, 'h'},
+        {"help", no_argument, 0, 'H'},
         {0, 0, 0, 0}
       };
       int option_index = 0;
@@ -200,6 +200,11 @@ public:
           int n = strtol(optarg, NULL, 10);
           if (n > 0 && n <= 0x7fffffff) nMinimumHeight = n;
           break;
+        }
+
+        case 'H': {
+          fprintf(stderr, help, argv[0]);
+          exit(EXIT_SUCCESS);
         }
 
         case '?': {
