@@ -89,8 +89,8 @@ public:
         {"minheight", required_argument, 0, 'x'},
         {"testnet", no_argument, &fUseTestNet, 1},
         {"wipeban", no_argument, &fWipeBan, 1},
-        {"wipeignore", no_argument, &fWipeBan, 1},
-        {"help", no_argument, 0, 'h'},
+        {"wipeignore", no_argument, &fWipeIgnore, 1},
+        {"help", no_argument, 0, 'H'},
         {0, 0, 0, 0}
       };
       int option_index = 0;
@@ -106,17 +106,17 @@ public:
           host = optarg;
           break;
         }
-        
+
         case 'm': {
           mbox = optarg;
           break;
         }
-        
+
         case 'n': {
           ns = optarg;
           break;
         }
-        
+
         case 't': {
           int n = strtol(optarg, NULL, 10);
           if (n > 0 && n < 1000) nThreads = n;
@@ -202,6 +202,11 @@ public:
           break;
         }
 
+        case 'H': {
+          fprintf(stderr, help, argv[0]);
+          exit(EXIT_SUCCESS);
+        }
+
         case '?': {
           showHelp = true;
           break;
@@ -223,6 +228,11 @@ public:
         filter_whitelist.insert(NODE_NETWORK_LIMITED | NODE_WITNESS | NODE_P2P_V2); // xc08
         filter_whitelist.insert(NODE_NETWORK_LIMITED | NODE_WITNESS | NODE_P2P_V2 | NODE_COMPACT_FILTERS); // xc48
         filter_whitelist.insert(NODE_NETWORK_LIMITED | NODE_WITNESS | NODE_BLOOM); // x40c
+        filter_whitelist.insert(NODE_NETWORK | NODE_WITNESS | NODE_MWEB); // x1000009
+        filter_whitelist.insert(NODE_NETWORK | NODE_WITNESS | NODE_MWEB | NODE_RIN3); // x3000009
+    } else {
+        fprintf(stderr, "Note: -w replaces the default filter set; only the"
+                        " listed filters are served.\n");
     }
     if (host != NULL && ns == NULL) showHelp = true;
     if (showHelp) fprintf(stderr, help, argv[0]);
@@ -420,21 +430,26 @@ extern "C" void* ThreadDumper(void*) {
         rename("dnsseed.dat.new", "dnsseed.dat");
       }
       FILE *d = fopen("dnsseed.dump", "w");
-      fprintf(d, "# address                                        good  lastSuccess    %%(2h)   %%(8h)   %%(1d)   %%(7d)  %%(30d)  blocks      svcs  version\n");
+      if (d)
+        fprintf(d, "# address                                        good  lastSuccess    %%(2h)   %%(8h)   %%(1d)   %%(7d)  %%(30d)  blocks      svcs  version\n");
       double stat[5]={0,0,0,0,0};
       for (vector<CAddrReport>::const_iterator it = v.begin(); it < v.end(); it++) {
         CAddrReport rep = *it;
-        fprintf(d, "%-47s  %4d  %11" PRId64 "  %6.2f%% %6.2f%% %6.2f%% %6.2f%% %6.2f%%  %6i  %08" PRIx64 "  %5i \"%s\"\n", rep.ip.ToString().c_str(), (int)rep.fGood, rep.lastSuccess, 100.0*rep.uptime[0], 100.0*rep.uptime[1], 100.0*rep.uptime[2], 100.0*rep.uptime[3], 100.0*rep.uptime[4], rep.blocks, rep.services, rep.clientVersion, rep.clientSubVersion.c_str());
+        if (d)
+          fprintf(d, "%-47s  %4d  %11" PRId64 "  %6.2f%% %6.2f%% %6.2f%% %6.2f%% %6.2f%%  %6i  %08" PRIx64 "  %5i \"%s\"\n", rep.ip.ToString().c_str(), (int)rep.fGood, rep.lastSuccess, 100.0*rep.uptime[0], 100.0*rep.uptime[1], 100.0*rep.uptime[2], 100.0*rep.uptime[3], 100.0*rep.uptime[4], rep.blocks, rep.services, rep.clientVersion, rep.clientSubVersion.c_str());
         stat[0] += rep.uptime[0];
         stat[1] += rep.uptime[1];
         stat[2] += rep.uptime[2];
         stat[3] += rep.uptime[3];
         stat[4] += rep.uptime[4];
       }
-      fclose(d);
+      if (d)
+        fclose(d);
       FILE *ff = fopen("dnsstats.log", "a");
-      fprintf(ff, "%llu %g %g %g %g %g\n", (unsigned long long)(time(NULL)), stat[0], stat[1], stat[2], stat[3], stat[4]);
-      fclose(ff);
+      if (ff) {
+        fprintf(ff, "%llu %g %g %g %g %g\n", (unsigned long long)(time(NULL)), stat[0], stat[1], stat[2], stat[3], stat[4]);
+        fclose(ff);
+      }
     }
   } while(1);
   return nullptr;
@@ -469,7 +484,7 @@ extern "C" void* ThreadStats(void*) {
   return nullptr;
 }
 
-static const string mainnet_seeds[] = {"seed.rin.so", ""};
+static const string mainnet_seeds[] = {"163.44.119.190", "210.131.221.23", ""};
 static const string testnet_seeds[] = {""};
 static const string *seeds = mainnet_seeds;
 static vector<string> vSeeds;
